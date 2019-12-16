@@ -1,0 +1,10 @@
+[client]
+default-character-set = utf8mb4
+port                  = <%= @ports[:mysql][:port] %>
+socket                = /var/run/mysqld/mysqld.sock
+ssl-ca                = <%= @certificates[:client][:certificates]['authority']['file'] %>
+ssl-cert              = <%= @certificates[:client][:certificates]['certificate']['file'] %>
+ssl-key               = <%= @certificates[:client][:certificates]['private_key']['file'] %>
+
+[mysql]
+default-character-set = utf8mb4
