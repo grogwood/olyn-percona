@@ -7,7 +7,16 @@ local_server = data_bag_item('servers', node[:hostname])
 # Load the mysql root user data bag item
 percona_root_user = data_bag_item('percona_users', node[:olyn_percona][:users][:root][:data_bag_item])
 
-# TODO: As of Chef 15, this response file is generated plain text and shown inline - has sensitive info
+# Remove MariaDB if it was on the server
+package 'mariadb-common' do
+  action :nothing
+end
+
+# Remove MySQL if it was on the server
+package 'mysql-common' do
+  action :nothing
+end
+
 # Install the base percona package unattended
 package node[:olyn_percona][:packages][:base] do
   options '-q -y'
@@ -17,6 +26,8 @@ package node[:olyn_percona][:packages][:base] do
     root_password: percona_root_user[:password]
   )
   action :install
+  notifies :remove, 'package[mariadb-common]', :before
+  notifies :remove, 'package[mysql-common]', :before
 end
 
 # One time lock file for percona member init (stops mysql on non-bootsrappers)

@@ -23,3 +23,11 @@ Client private key: `/etc/mysql/certs/client-key.pem`
 ### Importing SQL files
 Percona requires a certain SQL format to import properly. To Properly prepare an export from an existing database into Percona the command is:  
 `mysqldump -u root -p"ROOT_PASSWORD" --single-transaction --master-data --skip-add-locks --routines --triggers DATABASENAME > /path/to/export.sql`
+
+### Conflicts With Existing Packages
+This package will check for and remove the following packages before install:
+
+`mariadb-common`  
+`mysql-common`  
+
+`mailutils` is commonly installed on VPS base images and will install these as dependencies.
