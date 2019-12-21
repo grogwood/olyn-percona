@@ -11,7 +11,8 @@ default[:olyn_percona][:packages][:server] = 'percona-xtradb-cluster-server-5.7'
 default[:olyn_percona][:percona_packages_data_bag_item] = 'percona'
 
 # MySQL root user
-default[:olyn_percona][:users][:root][:data_bag_item] = 'percona_root'
+default[:olyn_percona][:users][:root][:data_bag_item]    = 'percona_root'
+default[:olyn_percona][:users][:root][:initial_password] = 'TemporaryPW'
 
 # The name of Percona seed file for debconf
 default[:olyn_percona][:seed_file] = 'percona-server.seed.erb'
