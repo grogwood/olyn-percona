@@ -23,11 +23,25 @@ package node[:olyn_percona][:packages][:base] do
   response_file node[:olyn_percona][:seed_file]
   response_file_variables(
     package:       node[:olyn_percona][:packages][:server],
-    root_password: percona_root_user[:password]
+    root_password: node[:olyn_percona][:users][:root][:initial_password]
   )
   action :install
   notifies :remove, 'package[mariadb-common]', :before
   notifies :remove, 'package[mysql-common]', :before
+end
+
+# Set the MySQL root password
+execute 'set_percona_root_password' do
+  command "mysql -u root -p'#{node[:olyn_percona][:users][:root][:initial_password]}' -e \"" \
+            "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '#{percona_root_user[:password]}'; " \
+            'FLUSH PRIVILEGES;"' \
+          ' && ' \
+          "touch #{Chef::Config[:file_cache_path]}/percona.root_password.lock"
+  user 'root'
+  group 'root'
+  sensitive true
+  action :run
+  creates "#{Chef::Config[:file_cache_path]}/percona.root_password.lock"
 end
 
 # One time lock file for percona member init (stops mysql on non-bootsrappers)
