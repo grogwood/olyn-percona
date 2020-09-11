@@ -101,10 +101,10 @@ template node[:olyn_percona][:config_files][:client_file] do
   owner 'root'
   group 'root'
   variables(
+    character_set: node[:olyn_percona][:configs][:character_set],
+    collation:     node[:olyn_percona][:configs][:collation],
     certificates: { server: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:server_data_bag_item]),
                     client: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:client_data_bag_item]) },
-    ports:        {
-      mysql: data_bag_item('ports', node[:olyn_percona][:ports][:mysql][:data_bag_item])
-    }
+    ports:        { mysql: data_bag_item('ports', node[:olyn_percona][:ports][:mysql][:data_bag_item]) }
   )
 end

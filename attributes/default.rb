@@ -11,6 +11,10 @@ default[:olyn_percona][:packages][:server] = 'percona-xtradb-cluster-server'
 default[:olyn_percona][:config_files][:mysqld_file] = '/etc/mysql/mysql.conf.d/mysqld.cnf'
 default[:olyn_percona][:config_files][:client_file] = '/etc/mysql/mysql.conf.d/client.cnf'
 
+# Default collation and character set
+default[:olyn_percona][:configs][:character_set] = 'utf8mb4'
+default[:olyn_percona][:configs][:collation] = 'utf8mb4_unicode_520_ci'
+
 # Percona packages data bag item
 default[:olyn_percona][:percona_packages_data_bag_item] = 'percona'
 
