@@ -1,11 +1,15 @@
 # Percona repo
 default[:olyn_percona][:release_manager][:url]  = 'https://repo.percona.com/apt/percona-release_latest.generic_all.deb'
 default[:olyn_percona][:release_manager][:file] = "#{Chef::Config[:file_cache_path]}/percona-release_latest.generic_all.deb"
-default[:olyn_percona][:release_manager][:repo] = 'pxc57'
+default[:olyn_percona][:release_manager][:repo] = 'pxc-80'
 
 # Percona packages
-default[:olyn_percona][:packages][:base]   = 'percona-xtradb-cluster-57'
-default[:olyn_percona][:packages][:server] = 'percona-xtradb-cluster-server-5.7'
+default[:olyn_percona][:packages][:base]   = 'percona-xtradb-cluster'
+default[:olyn_percona][:packages][:server] = 'percona-xtradb-cluster-server'
+
+# Config file locations on the server
+default[:olyn_percona][:config_files][:mysqld_file] = '/etc/mysql/mysql.conf.d/mysqld.cnf'
+default[:olyn_percona][:config_files][:client_file] = '/etc/mysql/mysql.conf.d/client.cnf'
 
 # Percona packages data bag item
 default[:olyn_percona][:percona_packages_data_bag_item] = 'percona'

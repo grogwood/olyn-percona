@@ -17,6 +17,11 @@ package 'mysql-common' do
   action :nothing
 end
 
+# Remove AppArmor if it was on the server
+package 'apparmor' do
+  action :nothing
+end
+
 # Install the base percona package unattended
 package node[:olyn_percona][:packages][:base] do
   options '-q -y'
@@ -28,6 +33,7 @@ package node[:olyn_percona][:packages][:base] do
   action :install
   notifies :remove, 'package[mariadb-common]', :before
   notifies :remove, 'package[mysql-common]', :before
+  notifies :remove, 'package[apparmor]', :before
 end
 
 # Set the MySQL root password
@@ -69,9 +75,9 @@ data_bag('servers').each do |server_item_name|
 
 end
 
-# Percona WSREP config file
-template '/etc/mysql/percona-xtradb-cluster.conf.d/wsrep.cnf' do
-  source 'wsrep.cnf.erb'
+# Percona MySqlD config file that holds WSREP settings
+template node[:olyn_percona][:config_files][:mysqld_file] do
+  source 'mysqld.cnf.erb'
   mode 0644
   owner 'root'
   group 'root'
@@ -90,7 +96,7 @@ template '/etc/mysql/percona-xtradb-cluster.conf.d/wsrep.cnf' do
 end
 
 # MySQL client config file
-template '/etc/mysql/percona-xtradb-cluster.conf.d/client.cnf' do
+template node[:olyn_percona][:config_files][:client_file] do
   source 'client.cnf.erb'
   mode 0644
   owner 'root'

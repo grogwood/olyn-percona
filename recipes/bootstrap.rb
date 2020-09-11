@@ -7,10 +7,9 @@ local_server = data_bag_item('servers', node[:hostname])
 # Load the mysql root user data bag item
 percona_root_user = data_bag_item('percona_users', node[:olyn_percona][:users][:root][:data_bag_item])
 
-# FOR BOOTSTRAPPERS ONLY
-# Initiate the cluster
+# Initiate/bootstrap the cluster
 execute 'percona_bootstrap' do
-  command '/etc/init.d/mysql bootstrap-pxc' \
+  command 'systemctl start mysql@bootstrap.service' \
           ' && ' \
           "touch #{Chef::Config[:file_cache_path]}/percona.bootstrapper.init.lock"
   creates "#{Chef::Config[:file_cache_path]}/percona.bootstrapper.init.lock"
