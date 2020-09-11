@@ -23,7 +23,10 @@ default[:olyn_percona][:users][:root][:data_bag_item]    = 'percona_root'
 default[:olyn_percona][:users][:root][:initial_password] = 'TemporaryPW'
 
 # The name of Percona seed file for debconf
-default[:olyn_percona][:seed_file] = 'percona.seed.erb'
+default[:olyn_percona][:seed_file][:name] = 'percona.seed.erb'
+
+# The answer for Authentication Method in the seed file
+default[:olyn_percona][:seed_file][:auth_method] = 'Use Legacy Authentication Method (Retain MySQL 5.x Compatibility)'
 
 # MySQL Percona SST user
 default[:olyn_percona][:users][:sst][:data_bag_item] = 'percona_sst'

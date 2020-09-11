@@ -25,10 +25,11 @@ end
 # Install the base percona package unattended
 package node[:olyn_percona][:packages][:base] do
   options '-q -y'
-  response_file node[:olyn_percona][:seed_file]
+  response_file node[:olyn_percona][:seed_file][:name]
   response_file_variables(
     package:       node[:olyn_percona][:packages][:server],
-    root_password: node[:olyn_percona][:users][:root][:initial_password]
+    root_password: node[:olyn_percona][:users][:root][:initial_password],
+    auth_method:   node[:olyn_percona][:seed_file][:auth_method]
   )
   action :install
   notifies :remove, 'package[mariadb-common]', :before
