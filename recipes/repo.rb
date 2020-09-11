@@ -34,9 +34,3 @@ execute 'percona_apt_update' do
   command 'apt-get update'
   action :nothing
 end
-
-# MySQL service definition
-service 'mysql' do
-  supports restart: true
-  action :nothing
-end
