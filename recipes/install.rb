@@ -84,7 +84,6 @@ template node[:olyn_percona][:config_files][:mysqld_file] do
   variables(
     local_server: local_server,
     cluster_ips:  cluster_ips,
-    sst_user:     data_bag_item('percona_users', node[:olyn_percona][:users][:sst][:data_bag_item]),
     certificates: { server: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:server_data_bag_item]),
                     client: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:client_data_bag_item]) },
     ports:        { group: data_bag_item('ports', node[:olyn_percona][:ports][:group][:data_bag_item]),
