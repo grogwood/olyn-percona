@@ -1,5 +1,5 @@
-# Include the common recipe
-include_recipe 'olyn_percona::common'
+# Include the services recipe
+include_recipe 'olyn_percona::services'
 
 # Load information about the current server from the servers data bag
 local_server = data_bag_item('servers', node[:hostname])

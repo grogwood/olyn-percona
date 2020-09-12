@@ -21,8 +21,9 @@ Client cert:` /etc/mysql/certs/client-cert.pem`
 Client private key: `/etc/mysql/certs/client-key.pem`
 
 ### Importing SQL files
-Percona requires a certain SQL format to import properly. To Properly prepare an export from an existing database into Percona the command is:  
-`mysqldump -u root -p"ROOT_PASSWORD" --single-transaction --master-data --skip-add-locks --routines --triggers DATABASENAME > /path/to/export.sql`
+Percona requires a certain SQL format to import properly. To Properly prepare an export from an existing database into Percona the command is:
+
+    mysqldump -u root -p"ROOT_PASSWORD" --single-transaction --master-data --skip-add-locks --routines --triggers DATABASENAME > /path/to/export.sql
 
 ### Conflicts With Existing Packages
 This package will check for and remove the following packages before install:
@@ -31,3 +32,12 @@ This package will check for and remove the following packages before install:
 `mysql-common`  
 
 `mailutils` is commonly installed on VPS base images and will install these as dependencies.
+
+### Using DebConf to automate answers to graphical installer
+The Percona installer is graphical and requires user input.
+This cookbook automates answers to the graphical installer using a seed file.
+If the questions change, you can see all of the input choices for the graphical installer with debconf:
+
+    debconf-get-selections |grep 'percona'
+
+Update the seed file in this package accordingly.
