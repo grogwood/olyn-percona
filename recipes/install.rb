@@ -32,14 +32,7 @@ package node[:olyn_percona][:packages][:base] do
   notifies :remove, 'package[mariadb-common]', :before
   notifies :remove, 'package[mysql-common]', :before
   notifies :remove, 'package[apparmor]', :before
-end
-
-# One time lock file for percona member init (stops mysql on non-bootsrappers)
-file "#{Chef::Config[:file_cache_path]}/percona.member.init.lock" do
-  action :create_if_missing
-  only_if { !local_server[:options][:percona][:bootstrapper] }
   notifies :stop, 'service[mysql]', :immediately
-  notifies :start, 'service[mysql]', :delayed
 end
 
 # An array of cluster IPs built from the server data bag
