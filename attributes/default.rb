@@ -30,9 +30,6 @@ default[:olyn_percona][:seed_file][:initial_password] = 'TemporaryPW'
 # Use legacy authentication method for 5.x backwards compatibility?
 default[:olyn_percona][:seed_file][:use_legacy_auth] = false
 
-# MySQL Percona SST user
-default[:olyn_percona][:users][:sst][:data_bag_item] = 'percona_sst'
-
 # Port data bag items
 default[:olyn_percona][:ports][:group][:data_bag_item] = 'percona_group'
 default[:olyn_percona][:ports][:mysql][:data_bag_item] = 'percona_mysql'
