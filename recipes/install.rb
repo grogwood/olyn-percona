@@ -4,9 +4,6 @@ include_recipe 'olyn_percona::services'
 # Load information about the current server from the servers data bag
 local_server = data_bag_item('servers', node[:hostname])
 
-# Load the mysql root user data bag item
-percona_root_user = data_bag_item('percona_users', node[:olyn_percona][:users][:root][:data_bag_item])
-
 # Remove MariaDB if it was on the server
 package 'mariadb-common' do
   action :nothing
@@ -35,20 +32,6 @@ package node[:olyn_percona][:packages][:base] do
   notifies :remove, 'package[mariadb-common]', :before
   notifies :remove, 'package[mysql-common]', :before
   notifies :remove, 'package[apparmor]', :before
-end
-
-# Set the MySQL root password
-execute 'set_percona_root_password' do
-  command "mysql -u root -p'#{node[:olyn_percona][:seed_file][:initial_password]}' -e \"" \
-            "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '#{percona_root_user[:password]}'; " \
-            'FLUSH PRIVILEGES;"' \
-          ' && ' \
-          "touch #{Chef::Config[:file_cache_path]}/percona.root_password.lock"
-  user 'root'
-  group 'root'
-  sensitive true
-  action :run
-  creates "#{Chef::Config[:file_cache_path]}/percona.root_password.lock"
 end
 
 # One time lock file for percona member init (stops mysql on non-bootsrappers)
