@@ -6,7 +6,7 @@ license 'GPL-3.0'
 supports 'debian', '>= 10'
 source_url 'https://gitlab.com/olyn/olyn_percona'
 description 'Installs and configures Percona'
-version '1.0.2'
+version '1.0.3'
 
 provides 'olyn_percona::default'
 provides 'olyn_percona::bootstrap'
