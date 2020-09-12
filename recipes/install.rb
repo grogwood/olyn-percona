@@ -52,7 +52,7 @@ data_bag('servers').each do |server_item_name|
 
 end
 
-# Percona MySqlD config file that holds WSREP settings
+# Percona MySQLd config file that holds WSREP settings
 template node[:olyn_percona][:config_files][:mysqld_file] do
   source 'mysqld.cnf.erb'
   mode 0644
