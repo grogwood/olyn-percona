@@ -7,16 +7,19 @@ local_server = data_bag_item('servers', node[:hostname])
 # Remove MariaDB if it was on the server
 package 'mariadb-common' do
   action :nothing
+  subscribes :remove, "package[#{node[:olyn_percona][:packages][:base]}]", :before
 end
 
 # Remove MySQL if it was on the server
 package 'mysql-common' do
   action :nothing
+  subscribes :remove, "package[#{node[:olyn_percona][:packages][:base]}]", :before
 end
 
 # Remove AppArmor if it was on the server
 package 'apparmor' do
   action :nothing
+  subscribes :remove, "package[#{node[:olyn_percona][:packages][:base]}]", :before
 end
 
 # Install the base percona package unattended
@@ -29,9 +32,6 @@ package node[:olyn_percona][:packages][:base] do
     use_legacy_auth:  node[:olyn_percona][:seed_file][:use_legacy_auth]
   )
   action :install
-  notifies :remove, 'package[mariadb-common]', :before
-  notifies :remove, 'package[mysql-common]', :before
-  notifies :remove, 'package[apparmor]', :before
   notifies :stop, 'service[mysql]', :immediately
 end
 
