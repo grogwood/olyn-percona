@@ -2,7 +2,7 @@
 local_server = data_bag_item('servers', node[:hostname])
 
 # Load the mysql root user data bag item
-percona_root_user = data_bag_item('percona_users', node[:olyn_percona][:users][:root][:data_bag_item])
+percona_root_user = data_bag_item(node[:olyn_percona][:users][:data_bag], node[:olyn_percona][:users][:root][:data_bag_item])
 
 # Set the MySQL root password
 execute 'set_percona_root_password' do

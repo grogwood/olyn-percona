@@ -18,8 +18,11 @@ default[:olyn_percona][:configs][:collation] = 'utf8mb4_unicode_520_ci'
 # Percona packages data bag item
 default[:olyn_percona][:percona_packages_data_bag_item] = 'percona'
 
-# MySQL root user
-default[:olyn_percona][:users][:root][:data_bag_item] = 'percona_root'
+# MySQL users data bag
+default[:olyn_percona][:users][:data_bag] = 'database_users'
+
+# Root user data bag item
+default[:olyn_percona][:users][:root][:data_bag_item] = 'root'
 
 # The name of Percona seed file for debconf
 default[:olyn_percona][:seed_file][:name] = 'percona.seed.erb'
