@@ -1,12 +1,12 @@
 # Load information about the current server from the servers data bag
 local_server = data_bag_item('servers', node[:hostname])
 
-# Load the mysql root user data bag item
-percona_root_user = data_bag_item('database_users', node[:olyn_percona][:users][:root][:data_bag_item])
+# Load the MySQL root user data bag item
+root_user = data_bag_item('database_users', node[:olyn_percona][:users][:root][:data_bag_item])
 
 # Set the MySQL root password
 execute 'set_percona_root_password' do
-  command "mysqladmin --user=root --password='#{node[:olyn_percona][:seed_file][:initial_password]}' password '#{percona_root_user[:password]}'" \
+  command "mysqladmin --user=root --password='#{node[:olyn_percona][:seed_file][:initial_password]}' password '#{root_user[:password]}'" \
           ' && ' \
           "touch #{Chef::Config[:file_cache_path]}/percona.root_password.lock"
   user 'root'
@@ -18,7 +18,7 @@ end
 
 # Secure MySQL from basic things
 execute 'mysql_secure_script' do
-  command "mysql -u root -p\"#{percona_root_user[:password]}\" -e \"" \
+  command "mysql -u root -p\"#{root_user[:password]}\" -e \"" \
             "DELETE FROM mysql.user WHERE User=''; " \
             "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1'); " \
             'DROP DATABASE IF EXISTS test; ' \
