@@ -30,6 +30,6 @@ execute 'mysql_secure_script' do
           "touch #{Chef::Config[:file_cache_path]}/percona.sql.hardening.lock"
   creates "#{Chef::Config[:file_cache_path]}/percona.sql.hardening.lock"
   action :run
-  only_if { local_server[:options][:percona][:bootstrapper] }
+  only_if { local_server[:options][:bootstrapper] }
   sensitive true
 end
