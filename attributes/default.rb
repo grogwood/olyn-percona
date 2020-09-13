@@ -18,9 +18,6 @@ default[:olyn_percona][:configs][:collation] = 'utf8mb4_unicode_520_ci'
 # Percona packages data bag item
 default[:olyn_percona][:percona_packages_data_bag_item] = 'percona'
 
-# MySQL users data bag
-default[:olyn_percona][:users][:data_bag] = 'database_users'
-
 # Root user data bag item
 default[:olyn_percona][:users][:root][:data_bag_item] = 'root'
 
