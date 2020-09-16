@@ -29,7 +29,8 @@ Percona requires a certain SQL format to import properly. To Properly prepare an
 This package will check for and remove the following packages before install:
 
 `mariadb-common`  
-`mysql-common`  
+`mysql-common`
+`apparmor`  
 
 `mailutils` is commonly installed on VPS base images and will install these as dependencies.
 

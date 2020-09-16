@@ -4,52 +4,35 @@ include_recipe 'olyn_percona::services'
 # Load information about the current server from the servers data bag
 local_server = data_bag_item('servers', node[:hostname])
 
-# Load the mysql root user data bag item
-percona_root_user = data_bag_item('percona_users', node[:olyn_percona][:users][:root][:data_bag_item])
-
 # Remove MariaDB if it was on the server
 package 'mariadb-common' do
   action :nothing
+  subscribes :remove, "package[#{node[:olyn_percona][:packages][:base]}]", :before
 end
 
 # Remove MySQL if it was on the server
 package 'mysql-common' do
   action :nothing
+  subscribes :remove, "package[#{node[:olyn_percona][:packages][:base]}]", :before
+end
+
+# Remove AppArmor if it was on the server
+package 'apparmor' do
+  action :nothing
+  subscribes :remove, "package[#{node[:olyn_percona][:packages][:base]}]", :before
 end
 
 # Install the base percona package unattended
 package node[:olyn_percona][:packages][:base] do
   options '-q -y'
-  response_file node[:olyn_percona][:seed_file]
+  response_file node[:olyn_percona][:seed_file][:name]
   response_file_variables(
-    package:       node[:olyn_percona][:packages][:server],
-    root_password: node[:olyn_percona][:users][:root][:initial_password]
+    package:          node[:olyn_percona][:packages][:server],
+    initial_password: node[:olyn_percona][:seed_file][:initial_password],
+    use_legacy_auth:  node[:olyn_percona][:seed_file][:use_legacy_auth]
   )
   action :install
-  notifies :remove, 'package[mariadb-common]', :before
-  notifies :remove, 'package[mysql-common]', :before
-end
-
-# Set the MySQL root password
-execute 'set_percona_root_password' do
-  command "mysql -u root -p'#{node[:olyn_percona][:users][:root][:initial_password]}' -e \"" \
-            "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '#{percona_root_user[:password]}'; " \
-            'FLUSH PRIVILEGES;"' \
-          ' && ' \
-          "touch #{Chef::Config[:file_cache_path]}/percona.root_password.lock"
-  user 'root'
-  group 'root'
-  sensitive true
-  action :run
-  creates "#{Chef::Config[:file_cache_path]}/percona.root_password.lock"
-end
-
-# One time lock file for percona member init (stops mysql on non-bootsrappers)
-file "#{Chef::Config[:file_cache_path]}/percona.member.init.lock" do
-  action :create_if_missing
-  only_if { !local_server[:options][:percona][:bootstrapper] }
   notifies :stop, 'service[mysql]', :immediately
-  notifies :start, 'service[mysql]', :delayed
 end
 
 # An array of cluster IPs built from the server data bag
@@ -69,16 +52,15 @@ data_bag('servers').each do |server_item_name|
 
 end
 
-# Percona WSREP config file
-template '/etc/mysql/percona-xtradb-cluster.conf.d/wsrep.cnf' do
-  source 'wsrep.cnf.erb'
+# Percona MySQLd config file that holds WSREP settings
+template node[:olyn_percona][:config_files][:mysqld_file] do
+  source 'mysqld.cnf.erb'
   mode 0644
   owner 'root'
   group 'root'
   variables(
     local_server: local_server,
     cluster_ips:  cluster_ips,
-    sst_user:     data_bag_item('percona_users', node[:olyn_percona][:users][:sst][:data_bag_item]),
     certificates: { server: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:server_data_bag_item]),
                     client: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:client_data_bag_item]) },
     ports:        { group: data_bag_item('ports', node[:olyn_percona][:ports][:group][:data_bag_item]),
@@ -90,16 +72,16 @@ template '/etc/mysql/percona-xtradb-cluster.conf.d/wsrep.cnf' do
 end
 
 # MySQL client config file
-template '/etc/mysql/percona-xtradb-cluster.conf.d/client.cnf' do
+template node[:olyn_percona][:config_files][:client_file] do
   source 'client.cnf.erb'
   mode 0644
   owner 'root'
   group 'root'
   variables(
+    character_set: node[:olyn_percona][:configs][:character_set],
+    collation:     node[:olyn_percona][:configs][:collation],
     certificates: { server: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:server_data_bag_item]),
                     client: data_bag_item('ssl_certificates', node[:olyn_percona][:ssl_certificates][:client_data_bag_item]) },
-    ports:        {
-      mysql: data_bag_item('ports', node[:olyn_percona][:ports][:mysql][:data_bag_item])
-    }
+    ports:        { mysql: data_bag_item('ports', node[:olyn_percona][:ports][:mysql][:data_bag_item]) }
   )
 end
