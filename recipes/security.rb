@@ -2,23 +2,25 @@
 local_server = data_bag_item('servers', node[:hostname])
 
 # Load the MySQL root user data bag item
-root_user = data_bag_item('database_users', node[:olyn_percona][:users][:root][:data_bag_item])
+root_user = data_bag_item('database_users', node[:olyn_percona][:user][:root][:data_bag_item])
 
 # Set the MySQL root password
-execute 'set_percona_root_password' do
-  command "mysql -u root -p'#{node[:olyn_percona][:seed_file][:initial_password]}' -e \"" \
+# todo Convert this to a bash script?
+execute 'set_root_password' do
+  command "mysql -u root -p'#{node[:olyn_percona][:seed_file][:config][:initial_password]}' -e \"" \
             "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '#{root_user[:password]}'; " \
             'FLUSH PRIVILEGES;"' \
           ' && ' \
-          "touch #{Chef::Config[:file_cache_path]}/percona.root_password.lock"
+          "touch #{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.set_root_password.lock"
   user 'root'
   group 'root'
   sensitive true
+  creates "#{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.set_root_password.lock"
   action :run
-  creates "#{Chef::Config[:file_cache_path]}/percona.root_password.lock"
 end
 
 # Secure MySQL from basic things
+# todo Convert this to a bash script?
 execute 'mysql_secure_script' do
   command "mysql -u root -p\"#{root_user[:password]}\" -e \"" \
             "DELETE FROM mysql.user WHERE User=''; " \
@@ -27,9 +29,11 @@ execute 'mysql_secure_script' do
             "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'; " \
             'FLUSH PRIVILEGES;"' \
           ' && ' \
-          "touch #{Chef::Config[:file_cache_path]}/percona.sql.hardening.lock"
-  creates "#{Chef::Config[:file_cache_path]}/percona.sql.hardening.lock"
+          "touch #{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.mysql_secure_script.lock"
+  user 'root'
+  group 'root'
+  sensitive true
+  creates "#{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.mysql_secure_script.lock"
   action :run
   only_if { local_server[:bootstrapper] }
-  sensitive true
 end
