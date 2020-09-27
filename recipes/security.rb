@@ -5,7 +5,6 @@ local_server = data_bag_item('servers', node[:hostname])
 root_user = data_bag_item('database_users', node[:olyn_percona][:user][:root][:data_bag_item])
 
 # Set the MySQL root password
-# todo Convert this to a bash script?
 execute 'set_root_password' do
   command "mysql -u root -p'#{node[:olyn_percona][:seed_file][:config][:initial_password]}' -e \"" \
             "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '#{root_user[:password]}'; " \
@@ -16,11 +15,11 @@ execute 'set_root_password' do
   group 'root'
   sensitive true
   creates "#{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.set_root_password.lock"
+  only_if { local_server[:bootstrapper] }
   action :run
 end
 
 # Secure MySQL from basic things
-# todo Convert this to a bash script?
 execute 'mysql_secure_script' do
   command "mysql -u root -p\"#{root_user[:password]}\" -e \"" \
             "DELETE FROM mysql.user WHERE User=''; " \
@@ -34,6 +33,6 @@ execute 'mysql_secure_script' do
   group 'root'
   sensitive true
   creates "#{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.mysql_secure_script.lock"
-  action :run
   only_if { local_server[:bootstrapper] }
+  action :run
 end

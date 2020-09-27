@@ -5,7 +5,6 @@ include_recipe 'olyn_percona::services'
 local_server = data_bag_item('servers', node[:hostname])
 
 # Initiate/bootstrap the cluster
-# todo Change this into a bash script?
 execute 'percona_bootstrap' do
   command 'systemctl start mysql@bootstrap.service' \
           ' && ' \
@@ -14,8 +13,8 @@ execute 'percona_bootstrap' do
   group 'root'
   creates "#{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.percona_bootstrap.lock"
   action :run
-  notifies :stop, 'service[mysql]', :before
   only_if { local_server[:bootstrapper] }
+  notifies :stop, 'service[mysql]', :before
 end
 
 # Start MySQL non-bootsrappers
