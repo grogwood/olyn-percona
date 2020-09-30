@@ -7,7 +7,7 @@ root_user = data_bag_item('database_users', node[:olyn_percona][:user][:root][:d
 # Set the MySQL root password
 execute 'set_root_password' do
   command "mysql -u root -p'#{node[:olyn_percona][:seed_file][:config][:initial_password]}' -e \"" \
-            "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '#{root_user[:password]}'; " \
+            "ALTER USER 'root'@'localhost' IDENTIFIED BY '#{root_user[:password]}'; " \
             'FLUSH PRIVILEGES;"' \
           ' && ' \
           "touch #{Chef::Config[:olyn_application_data_path]}/lock/olyn_percona.set_root_password.lock"
